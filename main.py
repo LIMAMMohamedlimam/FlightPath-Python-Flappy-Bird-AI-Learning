@@ -1,4 +1,5 @@
 
+import time
 import pygame
 import random
 
@@ -11,15 +12,18 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Colors
 WHITE = (255, 255, 255)
-GREEN = (0, 255, 0)
+GREEN = (0, 0, 0)
 
 # Game constants
 GRAVITY = 0.25
 FLAP_POWER = -5
 BAR_WIDTH = 70
+FPS = 60
 GAP_SIZE = 150
 BAR_VELOCITY = -4
-FPS = 60
+
+#Font for the score display
+SCORE_FONT = pygame.font.SysFont('Arial' , 20)
 
 
 
@@ -79,15 +83,24 @@ class Game:
         self.clock = pygame.time.Clock()
         self.score = 0
         self.game_over = False
+        self.start_time = None #clock
 
     def reset(self):
         self.disc.reset()
         self.bars = []
         self.score = 0
         self.game_over = False
+        self.start_time = time.time()
+
+    def display_score(self):
+        timepassed = int(time.time() - self.start_time) #temp écouler
+        score_text = f"Score : {self.score} Time : {timepassed}" #score
+        score_surface = SCORE_FONT.render(score_text , True , GREEN) 
+        screen.blit(score_surface, [5,5])
 
     def run(self):
         running = True
+        self.start_time = time.time() #Initialisation du conteur 
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -95,6 +108,8 @@ class Game:
                 if event.type == pygame.KEYDOWN and not self.game_over:
                     if event.key == pygame.K_SPACE:
                         self.disc.flap()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    self.disc.flap()
 
             screen.fill(WHITE)
 
@@ -122,6 +137,8 @@ class Game:
             self.disc.draw()
             for bar in self.bars:
                 bar.draw()
+
+            self.display_score()
 
             if self.game_over:
                 self.reset()
