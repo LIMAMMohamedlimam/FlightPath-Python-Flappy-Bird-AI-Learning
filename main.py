@@ -1,4 +1,4 @@
-# game_oop.py
+
 import pygame
 import random
 
